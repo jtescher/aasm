@@ -1,6 +1,6 @@
 module AASM
   module Persistence
-    module ActiveRecordPersistence
+    module MongoMapperPersistence
       # This method:
       #
       # * extends the model with ClassMethods
@@ -17,14 +17,16 @@ module AASM
       #
       # As a result, it doesn't matter when you define your methods - the following 2 are equivalent
       #
-      #   class Foo < ActiveRecord::Base
+      #   class Foo 
+      #     include MongoMapper::Cocument
       #     def aasm_write_state(state)
       #       "bar"
       #     end
       #     include AASM
       #   end
       #
-      #   class Foo < ActiveRecord::Base
+      #   class Foo
+      #     include MongoMapper::Document
       #     include AASM
       #     def aasm_write_state(state)
       #       "bar"
@@ -32,14 +34,14 @@ module AASM
       #   end
       #
       def self.included(base)
-        base.extend AASM::Persistence::ActiveRecordPersistence::ClassMethods
-        base.send(:include, AASM::Persistence::ActiveRecordPersistence::InstanceMethods)
-        base.send(:include, AASM::Persistence::ActiveRecordPersistence::ReadState) unless base.method_defined?(:aasm_read_state)
-        base.send(:include, AASM::Persistence::ActiveRecordPersistence::WriteState) unless base.method_defined?(:aasm_write_state)
-        base.send(:include, AASM::Persistence::ActiveRecordPersistence::WriteStateWithoutPersistence) unless base.method_defined?(:aasm_write_state_without_persistence)
+        base.extend AASM::Persistence::MongoMapperPersistence::ClassMethods
+        base.send(:include, AASM::Persistence::MongoMapperPersistence::InstanceMethods)
+        base.send(:include, AASM::Persistence::MongoMapperPersistence::ReadState) unless base.method_defined?(:aasm_read_state)
+        base.send(:include, AASM::Persistence::MongoMapperPersistence::WriteState) unless base.method_defined?(:aasm_write_state)
+        base.send(:include, AASM::Persistence::MongoMapperPersistence::WriteStateWithoutPersistence) unless base.method_defined?(:aasm_write_state_without_persistence)
 
         if base.respond_to?(:named_scope)
-          base.extend(AASM::Persistence::ActiveRecordPersistence::NamedScopeMethods)
+          base.extend(AASM::Persistence::MongoMapperPersistence::NamedScopeMethods)
 
           base.class_eval do
             class << self
@@ -56,24 +58,20 @@ module AASM
       module ClassMethods
         # Maps to the aasm_column in the database.  Deafults to "aasm_state".  You can write:
         #
-        #   create_table :foos do |t|
-        #     t.string :name
-        #     t.string :aasm_state
-        #   end
-        #
-        #   class Foo < ActiveRecord::Base
+        #   class Foo 
+        #     include MongoMapper::Document
         #     include AASM
+        #     key :aasm_state, String
         #   end
         #
         # OR:
         #
-        #   create_table :foos do |t|
-        #     t.string :name
-        #     t.string :status
-        #   end
+ 
         #
-        #   class Foo < ActiveRecord::Base
+        #   class Foo 
+        #     include MongoMapper::Document
         #     include AASM
+        #     key :status, String
         #     aasm_column :status
         #   end
         #
@@ -206,8 +204,10 @@ module AASM
         #
         # If it's a new record, and the aasm state column is blank it returns the initial state:
         #
-        #   class Foo < ActiveRecord::Base
+        #   class Foo 
+        #     include MongoMapper::Document
         #     include AASM
+        #     key :status, String
         #     aasm_column :status
         #     aasm_state :opened
         #     aasm_state :closed
