@@ -1,9 +1,8 @@
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'aasm')
+
 begin
   require 'rubygems'
   require 'active_record'
-  require 'logger'
-  
-  ActiveRecord::Base.logger = Logger.new(STDERR)
 
   # A dummy class for mocking the activerecord connection class
   class Connection
@@ -215,16 +214,16 @@ begin
     end
 
     context "Does not already respond_to? the scope name" do
-      it "should add a scope" do
+      it "should add a named_scope" do
+        NamedScopeExample.should_receive(:named_scope)
         NamedScopeExample.aasm_state :unknown_scope
-        NamedScopeExample.scopes.keys.should include(:unknown_scope)
       end
     end
 
     context "Already respond_to? the scope name" do
-      it "should not add a scope" do
+      it "should not add a named_scope" do
+        NamedScopeExample.should_not_receive(:named_scope)
         NamedScopeExample.aasm_state :new
-        NamedScopeExample.scopes.keys.should_not include(:new)
       end
     end
   end

@@ -1,7 +1,3 @@
-= Alternatives
-
-If you are looking for an alternative to AASM, I would highly suggest transitions: http://github.com/qoobaa/transitions
-
 = AASM - Ruby state machines
 
 This package contains AASM, a library for adding finite state machines to Ruby classes.
@@ -70,8 +66,6 @@ Here's a quick example highlighting some of the features.
   class Conversation
     include AASM
 
-    aasm_column :current_state # defaults to aasm_state
-
     aasm_initial_state :unread
 
     aasm_state :unread
@@ -94,8 +88,6 @@ This example uses a few of the more complex features available.
 
   class Relationship
     include AASM
-
-    aasm_column :status
     
     aasm_initial_state Proc.new { |relationship| relationship.strictly_for_fun? ? :intimate : :dating }
     
