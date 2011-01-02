@@ -50,12 +50,8 @@ module AASM
             end
           end
         end
-        
-        if ActiveRecord::VERSION::MAJOR >= 3
-          base.before_validation(:aasm_ensure_initial_state, :on => :create)
-        else
           base.before_validation_on_create(:aasm_ensure_initial_state)
-        end        
+
       end
 
       module ClassMethods
@@ -243,15 +239,16 @@ module AASM
       module NamedScopeMethods
         def aasm_state_with_scope name, options = {}
           aasm_state_without_scope name, options
-          
+
           unless self.respond_to?(name)
             scope_options = {:conditions => { "#{table_name}.#{self.aasm_column}" => name.to_s}}
             scope_method = ActiveRecord::VERSION::MAJOR >= 3 ? :scope : :named_scope
             self.send(scope_method, name, scope_options)
           end
-          
+
         end
       end
     end
   end
 end
+
